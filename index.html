@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El nostre calendari 🎄</title>
+
+```
+<style>
+    body {
+        margin: 0;
+        min-height: 100vh;
+        background: #18213d;
+        color: white;
+        font-family: monospace;
+        text-align: center;
+    }
+
+    .contenidor {
+        max-width: 700px;
+        margin: auto;
+        padding: 30px 20px;
+    }
+
+    h1 {
+        font-size: 35px;
+        text-shadow: 4px 4px #000;
+    }
+
+    .personatge {
+        font-size: 80px;
+        margin: 20px;
+    }
+
+    .calendari {
+    position: relative;
+    width: 100%;
+    max-width: 650px;
+    height: 1900px;
+    margin: 30px auto;
+
+    background: linear-gradient(#9bc4e4, #dceefa);
+
+    border: 5px solid #000;
+    box-shadow: 8px 8px #000;
+    overflow: hidden;
+
+}
+
+    .dia {
+    position: absolute;
+    width: 48px;
+    height: 48px;
+
+    background: #7b5e3b;
+    border: 4px solid #000;
+    color: white;
+
+    font-size: 20px;
+    font-weight: bold;
+
+    cursor: pointer;
+    box-shadow: 4px 4px #000;
+
+    z-index: 10;
+}
+
+.bloquejat {
+    background: #333;
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
+.decoracio {
+    position: absolute;
+    font-size: 45px;
+    z-index: 2;
+    pointer-events: none;
+}
+
+    .bloquejat {
+        background: #333;
+        cursor: not-allowed;
+    }
+
+    .dia:not(.bloquejat):hover {
+        transform: translate(-2px, -2px);
+    }
+
+    @media (max-width: 500px) {
+        .contenidor {
+            padding: 20px 12px;
+        }
+
+        h1 {
+            font-size: 25px;
+        }
+
+        .calendari {
+            gap: 7px;
+        }
+
+        .dia {
+            font-size: 16px;
+            box-shadow: 3px 3px #000;
+        }
+    }
+    .finestra {
+    display: none;
+     z-index: 1000;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.recompensa {
+    background: #26365c;
+    border: 5px solid #000;
+    box-shadow: 8px 8px #000;
+    width: min(400px, 90vw);
+    padding: 30px;
+    position: relative;
+}
+
+.recompensa img {
+    width: 180px;
+    height: 180px;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+/* =========================
+   ANIMACIONS DEL COFRE
+   ========================= */
+
+.cofre-tremolant {
+    animation: tremolar 0.8s ease-in-out;
+}
+
+@keyframes tremolar {
+
+    0% {
+        transform: translateX(0) rotate(0deg);
+    }
+
+    10% {
+        transform: translateX(-4px) rotate(-2deg);
+    }
+
+    20% {
+        transform: translateX(5px) rotate(2deg);
+    }
+
+    30% {
+        transform: translateX(-7px) rotate(-3deg);
+    }
+
+    40% {
+        transform: translateX(7px) rotate(3deg);
+    }
+
+    50% {
+        transform: translateX(-9px) rotate(-4deg);
+    }
+
+    60% {
+        transform: translateX(9px) rotate(4deg);
+    }
+
+    70% {
+        transform: translateX(-6px) rotate(-3deg);
+    }
+
+    80% {
+        transform: translateX(6px) rotate(3deg);
+    }
+
+    90% {
+        transform: translateX(-3px) rotate(-1deg);
+    }
+
+    100% {
+        transform: translateX(0) rotate(0deg);
+    }
+}
+
+
+/* =========================
+   BRILLANTOR DE LA PANTALLA
+   ========================= */
+
+.brillantor-pantalla {
+    position: fixed;
+    inset: 0;
+    background: white;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 3000;
+    transition: opacity 0.35s ease;
+}
+
+.brillantor-pantalla.activa {
+    opacity: 0.95;
+}
+
+.brillantor-pantalla.final {
+    opacity: 0;
+}
+
+
+/* =========================
+   ANIMACIÓ DEL PREMI
+   ========================= */
+
+.premi-apareix {
+    animation: apareixer 0.5s ease-out;
+}
+
+@keyframes apareixer {
+
+    from {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+}
+
+
+/* =========================
+   BOTÓ TANCAR
+   ========================= */
+
+.tancar {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    background: #d94c4c;
+    border: 3px solid #000;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+
+/* =========================
+   BOTÓ OBRIR
+   ========================= */
+
+.obrir {
+    background: #d4a72c;
+    border: 4px solid #000;
+    box-shadow: 4px 4px #000;
+    padding: 12px 20px;
+    font-family: monospace;
+    font-weight: bold;
+    cursor: pointer;
+}
+/* =========================
+   PANTALLA D'INTRO
+   ========================= */
+
+.intro {
+    position: fixed;
+    inset: 0;
+
+    background: #18213d;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    z-index: 2000;
+
+    transition: opacity 0.8s ease;
+}
+
+.intro-contingut {
+    width: min(600px, 90vw);
+    text-align: center;
+}
+
+.intro-personatge {
+    margin: 15px auto 5px;
+
+    height: 120px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.intro-personatge img {
+    height: 120px;
+    width: auto;
+
+    image-rendering: pixelated;
+}
+.intro h1 {
+    font-size: 32px;
+    text-shadow: 4px 4px #000;
+}
+
+.dialeg {
+    position: relative;
+
+    background: white;
+    color: #18213d;
+
+    border: 5px solid #000;
+    box-shadow: 7px 7px #000;
+
+    padding: 18px 22px;
+
+    margin: 15px auto 30px;
+
+    font-size: 18px;
+    font-weight: bold;
+
+    max-width: 500px;
+
+    min-height: 25px;
+}
+/* Cua de la bafarada */
+
+.dialeg::after {
+    content: "";
+
+    position: absolute;
+
+    top: -17px;
+    left: 50%;
+
+    width: 22px;
+    height: 22px;
+
+    background: white;
+
+    border-left: 5px solid #000;
+    border-top: 5px solid #000;
+
+    transform: translateX(-50%) rotate(45deg);
+}
+.comencar {
+    background: #d4a72c;
+
+    border: 4px solid #000;
+    box-shadow: 5px 5px #000;
+
+    color: white;
+
+    padding: 15px 30px;
+
+    font-family: monospace;
+    font-weight: bold;
+    font-size: 20px;
+
+    cursor: pointer;
+}
+
+.comencar:hover {
+    transform: translate(-2px, -2px);
+}
+.saltar-intro {
+    display: block;
+    margin: 18px auto 0;
+
+    background: transparent;
+
+    border: 2px solid rgba(255,255,255,0.5);
+
+    color: rgba(255,255,255,0.7);
+
+    padding: 8px 18px;
+
+    font-family: monospace;
+    font-size: 14px;
+
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+}
+
+.saltar-intro:hover {
+    color: white;
+    border-color: white;
+}
+.intro.desapareixer {
+    opacity: 0;
+    pointer-events: none;
+}
+/* =========================
+   PERSONATGE DEL MAPA
+   ========================= */
+
+.personatge-mapa {
+    position: absolute;
+
+    width: 55px;
+    height: auto;
+
+    image-rendering: pixelated;
+
+    z-index: 20;
+
+    pointer-events: none;
+
+    left: 50%;
+    top: 0;
+
+    transform: translateX(-50%);
+}
+.personatge-mapa.caminant {
+    transition:
+        left 0.12s linear,
+        top 0.12s linear;
+}
+/* =========================
+   NEU DEL MAPA
+   ========================= */
+
+.neu {
+    position: absolute;
+    top: -10px;
+
+    width: 4px;
+    height: 4px;
+
+    background: white;
+
+    image-rendering: pixelated;
+
+    pointer-events: none;
+    z-index: 5;
+
+    animation: caureNeu linear infinite;
+}
+
+@keyframes caureNeu {
+
+    0% {
+        transform: translate(0, -20px);
+    }
+
+    100% {
+        transform: translate(30px, 1950px);
+    }
+
+}
+/* =========================
+   COMPTE ENRERE
+   ========================= */
+
+#compteEnrere {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+
+    background: #26365c;
+    border: 4px solid #000;
+    box-shadow: 5px 5px #000;
+
+    padding: 12px 18px;
+
+    z-index: 1500;
+
+    font-family: monospace;
+    text-align: center;
+}
+
+.comptador-titol {
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+#tempsRestant {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+
+/* =========================
+   MISSATGE COFRE BLOQUEJAT
+   ========================= */
+
+#missatgeBloquejat {
+    position: fixed;
+
+    display: none;
+
+    background: #26365c;
+    color: white;
+
+    border: 4px solid #000;
+    box-shadow: 5px 5px #000;
+
+    padding: 10px 15px;
+
+    font-family: monospace;
+    font-weight: bold;
+    font-size: 14px;
+
+    z-index: 2000;
+
+    pointer-events: none;
+}
+</style>
+```
+
+</head>
+
+<body>
+<div id="compteEnrere">
+    <div class="comptador-titol">❄️ SEGÜENT COFRE</div>
+    <div id="tempsRestant">Calculant...</div>
+</div>
+
+<div id="missatgeBloquejat"></div>
+```
+<div class="contenidor">
+<div class="intro" id="intro">
+
+ <div class="intro-contingut">
+
+    <h1>🎄 EL NOSTRE CALENDARI 🎄</h1>
+
+    <div class="intro-personatge">
+        <img id="personatgeIntro" src="imatges/personatge_tancat.png" alt="Personatge">
+    </div>
+
+    <div class="dialeg">
+        <p id="textIntro"></p>
+    </div>
+
+<button class="comencar" id="botoIntro" onclick="següentDialeg()">
+    CONTINUAR
+</button>
+<button class="saltar-intro" onclick="saltarIntro()">
+    SALTAR INTRO
+</button>
+    </div>
+
+</div>
+    <h1>🎄 EL NOSTRE CALENDARI 🎄</h1>
+
+    <p>Una sorpresa cada dia ❤️</p>
+
+
+    <div class="calendari" id="calendari"></div>
+
+</div>
+
+<script>
+
+const calendari = document.getElementById("calendari");
+// =========================
+// NEU ANIMADA
+// =========================
+
+for (let i = 0; i < 80; i++) {
+
+    const floc = document.createElement("div");
+
+    floc.classList.add("neu");
+
+    // Posició horitzontal aleatòria
+    floc.style.left = Math.random() * 100 + "%";
+
+    // Mida aleatòria
+    const mida = Math.random() * 4 + 2;
+
+    floc.style.width = mida + "px";
+    floc.style.height = mida + "px";
+
+    // Velocitat aleatòria
+    const duracio = Math.random() * 8 + 7;
+
+    floc.style.animationDuration = duracio + "s";
+
+    // Comencen en moments diferents
+    floc.style.animationDelay =
+        -Math.random() * duracio + "s";
+
+    calendari.appendChild(floc);
+}
+// =========================
+// PERSONATGE DEL MAPA
+// =========================
+
+const personatge = document.createElement("img");
+
+personatge.src = "imatges/personatge.png";
+personatge.alt = "El meu personatge";
+
+personatge.classList.add("personatge-mapa");
+
+calendari.appendChild(personatge);
+
+// =========================
+// DIÀLEG DE LA INTRO
+// =========================
+
+const textosIntro = [
+    "He preparat una petita aventura per a tu... ❤️",
+
+    "Durant els pròxims 30 dies hauràs d'anar descobrint els cofres que he amagat pel mapa. ❄️",
+
+    "Però hi ha una cosa que no sabràs mai abans d'obrir-los... 👀",
+
+    "Quina sorpresa t'haurà tocat? 🎁",
+
+    "Així que prepara't... perquè l'aventura comença ara. ❤️"
+];
+
+let dialegActual = 0;
+let escrivint = false;
+let temporitzadorText;
+let animacioParlant;
+function començarParlar() {
+
+    const personatgeIntro =
+        document.getElementById("personatgeIntro");
+
+    clearInterval(animacioParlant);
+
+    animacioParlant = setInterval(function() {
+
+        if (personatgeIntro.src.includes("personatge_tancat.png")) {
+
+            personatgeIntro.src =
+                "imatges/personatge_obert.png";
+
+        } else {
+
+            personatgeIntro.src =
+                "imatges/personatge_tancat.png";
+        }
+
+    }, 180);
+}
+
+
+function pararParlar() {
+
+    clearInterval(animacioParlant);
+
+    document.getElementById("personatgeIntro").src =
+        "imatges/personatge_tancat.png";
+}
+
+function escriureText(text) {
+
+    const element =
+        document.getElementById("textIntro");
+
+    element.textContent = "";
+
+    let index = 0;
+
+    escrivint = true;
+
+    clearInterval(temporitzadorText);
+
+    // Comencem a moure la boca
+    començarParlar();
+
+    temporitzadorText = setInterval(function() {
+
+        element.textContent += text[index];
+
+        index++;
+
+        if (index >= text.length) {
+
+            clearInterval(temporitzadorText);
+
+            escrivint = false;
+
+            // Quan acaba de parlar, tanca la boca
+            pararParlar();
+        }
+
+    }, 35);
+}
+
+
+function següentDialeg() {
+
+    // Si encara està escrivint,
+    // mostrem directament tot el text.
+   if (escrivint) {
+
+    clearInterval(temporitzadorText);
+
+    document.getElementById("textIntro").textContent =
+        textosIntro[dialegActual];
+
+    escrivint = false;
+
+    pararParlar();
+
+    return;
+}
+
+    dialegActual++;
+
+    // Si encara queden frases
+    if (dialegActual < textosIntro.length) {
+
+        escriureText(textosIntro[dialegActual]);
+
+    } else {
+
+        document.getElementById("botoIntro").textContent =
+            "COMENÇAR AVENTURA";
+
+        document.getElementById("botoIntro").onclick =
+            comencarAventura;
+    }
+}
+
+
+// Comencem el primer diàleg
+escriureText(textosIntro[0]);
+function comencarAventura() {
+
+    const intro = document.getElementById("intro");
+
+    intro.classList.add("desapareixer");
+
+    // Comencem el recorregut del personatge
+    iniciarRecorregut();
+
+    setTimeout(function() {
+
+        intro.style.display = "none";
+
+    }, 800);
+}
+function iniciarMovimentPersonatge() {
+
+    // Comencem al dia 1
+    mourePersonatge(1);
+
+    // Esperem una mica perquè es vegi el moviment
+    setTimeout(function() {
+
+        personatge.classList.add("caminant");
+
+        mourePersonatge(diaActual);
+
+    }, 300);
+}
+function saltarIntro() {
+
+    clearInterval(temporitzadorText);
+
+    const intro = document.getElementById("intro");
+
+    intro.classList.add("desapareixer");
+
+    // Comencem el recorregut del personatge
+    iniciarRecorregut();
+
+    setTimeout(function() {
+
+        intro.style.display = "none";
+
+    }, 800);
+}
+
+// Camí de neu
+const cami = document.createElement("div");
+cami.classList.add("cami");
+calendari.appendChild(cami);
+
+
+
+
+// ===============================
+// PREMIS DELS 30 DIES
+// ===============================
+
+const premis = [
+    "Premi del dia 1 🎁",
+    "Premi del dia 2 🎁",
+    "Premi del dia 3 🎁",
+    "Premi del dia 4 🎁",
+    "Premi del dia 5 🎁",
+    "Premi del dia 6 🎁",
+    "Premi del dia 7 🎁",
+    "Premi del dia 8 🎁",
+    "Premi del dia 9 🎁",
+    "Premi del dia 10 🎁",
+    "Premi del dia 11 🎁",
+    "Premi del dia 12 🎁",
+    "Premi del dia 13 🎁",
+    "Premi del dia 14 🎁",
+    "Premi del dia 15 🎁",
+    "Premi del dia 16 🎁",
+    "Premi del dia 17 🎁",
+    "Premi del dia 18 🎁",
+    "Premi del dia 19 🎁",
+    "Premi del dia 20 🎁",
+    "Premi del dia 21 🎁",
+    "Premi del dia 22 🎁",
+    "Premi del dia 23 🎁",
+    "Premi del dia 24 🎁",
+    "Premi del dia 25 🎁",
+    "Premi del dia 26 🎁",
+    "Premi del dia 27 🎁",
+    "Premi del dia 28 🎁",
+    "Premi del dia 29 🎁",
+    "Premi del dia 30 🎁"
+];
+
+
+// ===============================
+// TIPUS DE COFRE DE CADA DIA
+// ===============================
+
+const cofres = [
+    "especial",
+    "comu",
+    "comu",
+    "mitic",
+    "especial",
+    "comu",
+    "especial",
+    "comu",
+    "llegendari",
+    "comu",
+    "especial",
+    "comu",
+    "especial",
+    "comu",
+    "mitic",
+    "especial",
+    "comu",
+    "comu",
+    "especial",
+    "mitic",
+    "comu",
+    "especial",
+    "comu",
+    "comu",
+    "especial",
+    "mitic",
+    "comu",
+    "especial",
+    "comu",
+    "llegendari"
+];
+
+
+
+// ===============================
+// DIA QUE ESTEM MIRANT
+// ===============================
+
+let diaObert = 0;
+
+
+// ===============================
+// NOMS DE LES RARESES
+// ===============================
+
+const noms = {
+    comu: "COMÚ",
+    especial: "ESPECIAL",
+    mitic: "MÍTIC",
+    llegendari: "LLEGENDARI"
+};
+
+
+// ===============================
+// OBRIR UN DIA
+// ===============================
+
+function obrirCofre(dia) {
+
+    diaObert = dia;
+
+    const tipus = cofres[dia - 1];
+
+    const imatge = document.getElementById("imatgeCofre");
+    const nom = document.getElementById("nomRaresa");
+    const numeroDia = document.getElementById("numeroDia");
+    const premi = document.getElementById("premi");
+
+    // Posem el cofre corresponent
+   imatge.src = "imatges/cofre_comu.png";
+
+    // Posem el nom de la raresa
+   nom.textContent = "COFRE";
+
+    // Posem el número del dia
+    numeroDia.textContent = "DIA " + dia;
+
+    // Reiniciem el premi
+    premi.textContent = "Una sorpresa per a tu ❤️";
+
+    // Traiem l'animació anterior
+    premi.classList.remove("premi-apareix");
+
+    // Mostrem la finestra
+    document.getElementById("finestra").style.display = "flex";
+}
+
+
+// ===============================
+// TANCAR EL COFRE
+// ===============================
+function tancarCofre() {
+
+    const finestra = document.getElementById("finestra");
+    const cofre = document.getElementById("imatgeCofre");
+    const premi = document.getElementById("premi");
+    const boto = document.querySelector(".obrir");
+    const brillantor = document.getElementById("brillantorPantalla");
+
+    finestra.style.display = "none";
+
+    // Reiniciem el cofre
+    cofre.classList.remove("cofre-tremolant");
+    cofre.src = "imatges/cofre_comu.png";
+
+    // Reiniciem el text
+    premi.textContent = "Una sorpresa per a tu ❤️";
+    premi.classList.remove("premi-apareix");
+
+    // Reiniciem el botó
+    boto.textContent = "OBRIR COFRE";
+    boto.style.display = "inline-block";
+    boto.disabled = false;
+    boto.onclick = mostrarPremi;
+
+    // Reiniciem la brillantor
+    brillantor.classList.remove("activa");
+    brillantor.classList.remove("final");
+}
+
+// ===============================
+// OBRIR EL COFRE I MOSTRAR PREMI
+// ===============================
+
+function mostrarPremi() {
+    
+
+    const cofre = document.getElementById("imatgeCofre");
+    const premi = document.getElementById("premi");
+    const boto = document.querySelector(".obrir");
+    const nom = document.getElementById("nomRaresa");
+    const brillantor = document.getElementById("brillantorPantalla");
+
+    // Evitem clicar dues vegades
+    boto.disabled = true;
+
+    // =========================
+    // FASE 1 — TREMOLA
+    // =========================
+
+    premi.textContent = "S'ESTÀ OBRINT... ✨";
+
+    cofre.classList.remove("cofre-tremolant");
+
+    // Forcem que l'animació es reiniciï
+    void cofre.offsetWidth;
+
+    cofre.classList.add("cofre-tremolant");
+
+
+    // =========================
+    // FASE 2 — COMENÇA LA LLUM
+    // =========================
+
+    setTimeout(function() {
+
+        brillantor.classList.remove("final");
+
+        void brillantor.offsetWidth;
+
+        brillantor.classList.add("activa");
+
+    }, 500);
+
+
+    // =========================
+    // FASE 3 — CANVIEM EL COFRE
+    // MENTRE LA PANTALLA ÉS BLANCA
+    // =========================
+
+    setTimeout(function() {
+
+        const tipus = cofres[diaObert - 1];
+
+        cofre.src = "imatges/cofre_" + tipus + ".png";
+
+        nom.textContent = noms[tipus];
+
+    }, 850);
+
+
+    // =========================
+    // FASE 4 — LA LLUM DESAPAREIX
+    // =========================
+
+    setTimeout(function() {
+
+        brillantor.classList.remove("activa");
+        brillantor.classList.add("final");
+
+        premi.textContent = "El teu cofre és... ✨";
+
+    }, 1100);
+
+
+    // =========================
+    // FASE 5 — MOSTREM EL BOTÓ
+    // =========================
+
+    setTimeout(function() {
+
+        premi.textContent = "El teu cofre és... ✨";
+
+        boto.textContent = "VEURE PREMI 🎁";
+
+        boto.disabled = false;
+
+        // Canviem l'acció del botó
+        boto.onclick = mostrarPremiFinal;
+
+    }, 1500);
+}
+// =========================
+// MOSTRAR EL PREMI FINAL
+// =========================
+
+function mostrarPremiFinal() {
+
+    const premi = document.getElementById("premi");
+    const boto = document.querySelector(".obrir");
+
+    premi.classList.remove("premi-apareix");
+
+    void premi.offsetWidth;
+
+    premi.textContent = premis[diaObert - 1];
+
+    premi.classList.add("premi-apareix");
+
+    boto.style.display = "none";
+}
+// ===============================
+// POSICIONS DELS 30 DIES
+// ===============================
+
+const posicionsDies = {
+
+    1:  { x: 50, y: 70 },
+    2:  { x: 35, y: 130 },
+    3:  { x: 25, y: 190 },
+    4:  { x: 40, y: 250 },
+    5:  { x: 60, y: 310 },
+
+    6:  { x: 72, y: 370 },
+    7:  { x: 60, y: 430 },
+    8:  { x: 42, y: 490 },
+    9:  { x: 25, y: 550 },
+    10: { x: 35, y: 610 },
+
+    11: { x: 55, y: 670 },
+    12: { x: 70, y: 730 },
+    13: { x: 60, y: 790 },
+    14: { x: 42, y: 850 },
+    15: { x: 25, y: 910 },
+
+    16: { x: 35, y: 970 },
+    17: { x: 55, y: 1030 },
+    18: { x: 70, y: 1090 },
+    19: { x: 58, y: 1150 },
+    20: { x: 40, y: 1210 },
+
+    21: { x: 25, y: 1270 },
+    22: { x: 40, y: 1330 },
+    23: { x: 60, y: 1390 },
+    24: { x: 72, y: 1450 },
+    25: { x: 58, y: 1510 },
+
+    26: { x: 42, y: 1570 },
+    27: { x: 25, y: 1630 },
+    28: { x: 40, y: 1690 },
+    29: { x: 60, y: 1750 },
+    30: { x: 50, y: 1810 }
+};
+
+
+// =========================
+// MOVIMENT DEL PERSONATGE
+// =========================
+
+function mourePersonatge(dia) {
+
+    const posicio = posicionsDies[dia];
+
+    if (!posicio) return;
+
+    personatge.style.left = posicio.x + "%";
+    personatge.style.top = (posicio.y - 90) + "px";
+}
+
+
+// =========================
+// RECORREGUT DEL PERSONATGE
+// =========================
+
+function iniciarRecorregut() {
+
+    // Comencem al dia 1
+    mourePersonatge(1);
+
+    let dia = 1;
+
+    // Temps total del recorregut
+    const duracioTotal = 3500;
+
+    // Temps entre cada casella
+    const tempsPerDia = duracioTotal / (diaActual - 1);
+
+    const interval = setInterval(function() {
+
+        dia++;
+
+        if (dia > diaActual) {
+
+            clearInterval(interval);
+            return;
+        }
+
+        mourePersonatge(dia);
+
+        // Seguim el personatge
+        enfocarPersonatge();
+
+    }, tempsPerDia);
+}
+
+// =========================
+// CÀMERA / SCROLL
+// =========================
+
+function enfocarPersonatge() {
+
+    const rect = personatge.getBoundingClientRect();
+
+    const centrePantalla = window.innerHeight / 2;
+
+    const diferencia =
+        rect.top - centrePantalla;
+
+    window.scrollBy({
+        top: diferencia,
+        behavior: "smooth"
+    });
+}
+
+// ===============================
+// CALENDARI AUTOMÀTIC
+// ===============================
+
+function obtenirDiaActual() {
+
+    // Data d'inici del calendari
+    const inici = new Date(2026, 11, 22, 0, 0, 0);
+
+    // Data i hora actual
+    const ara = new Date();
+
+    // Diferència en mil·lisegons
+    const diferencia = ara - inici;
+
+    // Cada dia = 24 hores
+    const diaEnMilisegons = 24 * 60 * 60 * 1000;
+
+    // Si encara no ha començat
+    if (diferencia < 0) {
+        return 0;
+    }
+
+    // Calculem quin dia toca
+    const dia = Math.floor(diferencia / diaEnMilisegons) + 1;
+
+    // Com a màxim, dia 30
+    return Math.min(dia, 30);
+}
+
+// 🧪 MODE PROVES
+// Posa false quan vulguis activar el calendari real
+const modeProves = true;
+
+const diaProva = 10;
+
+const diaActual = modeProves
+    ? diaProva
+    : obtenirDiaActual();
+// ===============================
+// COMPTE ENRERE DEL SEGÜENT COFRE
+// ===============================
+
+function actualitzarCompteEnrere() {
+
+    const ara = new Date();
+
+    // Si ja hem arribat al dia 30
+    if (diaActual >= 30) {
+
+        document.getElementById("tempsRestant").textContent =
+            "🎉 AVENTURA COMPLETADA!";
+
+        return;
+    }
+
+    // Data d'inici del calendari
+    const iniciCalendari =
+        new Date(2026, 11, 22, 0, 0, 0);
+
+    // Quin dia serà el següent
+    const seguentDia = diaActual + 1;
+
+    // Moment exacte en què es desbloqueja
+    const properCofre = new Date(
+        iniciCalendari.getTime() +
+        (seguentDia - 1) * 24 * 60 * 60 * 1000
+    );
+
+    // Temps que falta
+    let diferencia = properCofre - ara;
+
+    // Evitem números negatius
+    if (diferencia < 0) {
+        diferencia = 0;
+    }
+
+    // Convertim el temps
+    const dies = Math.floor(
+        diferencia / (1000 * 60 * 60 * 24)
+    );
+
+    const hores = Math.floor(
+        (diferencia % (1000 * 60 * 60 * 24)) /
+        (1000 * 60 * 60)
+    );
+
+    const minuts = Math.floor(
+        (diferencia % (1000 * 60 * 60)) /
+        (1000 * 60)
+    );
+
+    const segons = Math.floor(
+        (diferencia % (1000 * 60)) /
+        1000
+    );
+
+    // Mostrem el compte enrere
+    document.getElementById("tempsRestant").textContent =
+    "DIA " + seguentDia + " · " +
+    String(hores).padStart(2, "0") + ":" +
+    String(minuts).padStart(2, "0") + ":" +
+    String(segons).padStart(2, "0")
+}
+
+
+// Actualitzem cada segon
+actualitzarCompteEnrere();
+
+setInterval(function() {
+
+    actualitzarCompteEnrere();
+
+}, 1000);
+
+// ===============================
+// CREEM ELS 30 DIES
+// ===============================
+
+for (let dia = 1; dia <= 30; dia++) {
+
+    const boto = document.createElement("button");
+
+    boto.classList.add("dia");
+
+    // Posició del dia
+    const posicio = posicionsDies[dia];
+
+    boto.style.left = posicio.x + "%";
+    boto.style.top = posicio.y + "px";
+
+    boto.style.transform = "translateX(-50%)";
+
+
+    // Dies desbloquejats
+    if (dia <= diaActual) {
+
+        boto.textContent = dia;
+
+        boto.addEventListener("click", function() {
+
+            obrirCofre(dia);
+
+        });
+
+   } else {
+
+    boto.textContent = "🔒";
+
+    boto.classList.add("bloquejat");
+
+    boto.disabled = true;
+
+    boto.addEventListener("mouseenter", function() {
+
+        mostrarMissatgeBloquejat(dia, boto);
+
+    });
+
+    boto.addEventListener("mouseleave", function() {
+
+        ocultarMissatgeBloquejat();
+
+    });
+}
+
+    calendari.appendChild(boto);
+}
+
+// ===============================
+// MISSATGE DELS DIES BLOQUEJATS
+// ===============================
+
+function mostrarMissatgeBloquejat(dia, boto) {
+
+    const missatge =
+        document.getElementById("missatgeBloquejat");
+
+    const diesRestants = dia - diaActual;
+
+    if (diesRestants === 1) {
+
+        missatge.textContent =
+            "🔒 Et falta 1 dia per poder obrir aquest cofre";
+
+    } else {
+
+        missatge.textContent =
+            "🔒 Et falten " +
+            diesRestants +
+            " dies per poder obrir aquest cofre";
+    }
+
+    const rect = boto.getBoundingClientRect();
+
+    missatge.style.left =
+        (rect.left + rect.width / 2) + "px";
+
+    missatge.style.top =
+        (rect.top - 55) + "px";
+
+    missatge.style.transform =
+        "translateX(-50%)";
+
+    missatge.style.display = "block";
+}
+
+
+function ocultarMissatgeBloquejat() {
+
+    document.getElementById(
+        "missatgeBloquejat"
+    ).style.display = "none";
+}
+</script>
+
+</body>
+
+</div>
+
+<div class="brillantor-pantalla" id="brillantorPantalla"></div>
+
+
+<div class="finestra" id="finestra">
+
+    <div class="recompensa">
+
+        <button class="tancar" onclick="tancarCofre()">✕</button>
+
+        <p id="numeroDia">DIA 1</p>
+
+        <img id="imatgeCofre" src="imatges/cofre_comu.png" alt="Cofre">
+
+        <h2 id="nomRaresa">COMÚ</h2>
+
+        <p id="premi">Una sorpresa per a tu ❤️</p>
+
+        <button class="obrir" onclick="mostrarPremi()">
+            OBRIR COFRE
+        </button>
+
+    </div>
+
+</div>
+</html>
